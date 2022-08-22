@@ -1,0 +1,176 @@
+#
+# Copyright (c) 2019-2022 Red Hat, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Next container build
+
+on:
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: main-container-build
+
+jobs:
+
+  build-next-imgs:
+    runs-on: ubuntu-20.04
+
+    outputs:
+      git-sha: ${{ steps.git-sha.outputs.sha }}
+
+    steps:
+    - name: Checkout devworkspace-operator source code
+      uses: actions/checkout@v2
+
+    - name: Set output for Git short SHA
+      id: git-sha
+      run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+
+    - name: Login to quay.io
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_PASSWORD }}
+        registry: quay.io
+
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          quay.io/devfile/devworkspace-controller:next
+          quay.io/devfile/devworkspace-controller:sha-${{ steps.git-sha.outputs.sha }}
+        file: ./build/Dockerfile
+
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          quay.io/devfile/project-clone:next
+          quay.io/devfile/project-clone:sha-${{ steps.git-sha.outputs.sha }}
+        file: ./project-clone/Dockerfile
+
+  build-next-olm-imgs:
+    runs-on: ubuntu-latest
+    needs: build-next-imgs
+    env:
+      DWO_BUNDLE_REPO: quay.io/devfile/devworkspace-operator-bundle
+      DWO_BUNDLE_TAG: next
+      DWO_INDEX_IMG: quay.io/devfile/devworkspace-operator-index:next
+      OPM_VERSION: v1.19.5
+      OPERATOR_SDK_VERSION: v1.8.0
+    steps:
+
+      - name: Cache Operator SDK ${{ env.OPERATOR_SDK_VERSION }}
+        uses: actions/cache@v2
+        id: cache-operator-sdk
+        with:
+          path: ~/cache
+          key: operator-sdk-${{ env.OPERATOR_SDK_VERSION }}
+
+      - name: Download Operator SDK ${{ env.OPERATOR_SDK_VERSION }}
+        if: steps.cache-operator-sdk.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/cache
+          wget https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk_linux_amd64 -O ~/cache/operator-sdk-${OPERATOR_SDK_VERSION} > /dev/null
+          chmod +x ~/cache/operator-sdk-${OPERATOR_SDK_VERSION}
+
+      - name: Install Operator SDK ${{ env.OPERATOR_SDK_VERSION }}
+        run: |
+          mkdir -p ~/bin
+          cp ~/cache/operator-sdk-${OPERATOR_SDK_VERSION} ~/bin/operator-sdk
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Cache OPM ${{ env.OPM_VERSION }}
+        uses: actions/cache@v2
+        id: cache-opm
+        with:
+          path: ~/cache
+          key: opm-${{ env.OPM_VERSION }}
+
+      - name: Download OPM ${{ env.OPM_VERSION }}
+        if: steps.cache-opm.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/cache
+          wget https://github.com/operator-framework/operator-registry/releases/download/${OPM_VERSION}/linux-amd64-opm -O ~/cache/opm${OPM_VERSION} > /dev/null
+          #${OPM_VERSION} is used in binary name to prevent caching after upgrading
+          chmod +x ~/cache/opm${OPM_VERSION}
+
+      - name: Install OPM ${{ env.OPM_VERSION }}
+        run: |
+          mkdir -p ~/bin
+          cp ~/cache/opm${OPM_VERSION} ~/bin/opm
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Checkout devworkspace-operator source code
+        uses: actions/checkout@v2
+
+      - name: Login to quay.io
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+          registry: quay.io
+
+      - name: "Build Bundle & Index images"
+        run: |
+          # Ubuntu latest comes with the _other_ version of yq.
+          pip install yq
+
+          # Update images used in bundle to use the sha-tagged image rather than just 'next'
+          # make generate_olm_bundle_yaml will be invoked by build_index_image.sh
+          export TAG="sha-${{ needs.build-next-imgs.outputs.git-sha }}"
+          export DEFAULT_DWO_IMG="quay.io/devfile/devworkspace-controller:$TAG"
+          export PROJECT_CLONE_IMG="quay.io/devfile/project-clone:$TAG"
+
+          # Next builds are not rolled out unless the version is incremented. We want to use semver
+          # prerelease tags to make sure each new build increments on the previous one, e.g.
+          # v0.15.0-dev.1, v0.15.0-dev.2, etc.
+          CURR_VERSION=$(yq -r '.spec.version' deploy/templates/components/csv/clusterserviceversion.yaml)
+          PREV_VERSION=$(opm render ${DWO_INDEX_IMG} |\
+            jq -r 'select(.schema == "olm.channel") | .entries[0].name | ltrimstr("devworkspace-operator.v")')
+          # Strip the static version number and build identifier to get the previous build number, e.g.
+          #   v0.15.0-dev.1+41e8ccb8 -> 1
+          # If previous version does not have build number/identifier, result is the full version (e.g. v0.15.0-dev)
+          PREV_ID=${PREV_VERSION##*-dev.}
+          PREV_ID=${PREV_ID%%+*}
+
+          if [ "$PREV_ID" == "$CURR_VERSION" ]; then
+            # no build number set, start at 0
+            NEXT_ID="0"
+          elif [ "${PREV_VERSION%%-*}" != "${CURR_VERSION%%-*}" ]; then
+            # minor version bump, moving from e.g. v0.14.0-dev.8 -> v0.15.0-dev.0
+            NEXT_ID="0"
+          else
+            NEXT_ID=$((PREV_ID+1))
+          fi
+
+          NEW_VERSION="${CURR_VERSION}.${NEXT_ID}+${{ needs.build-next-imgs.outputs.git-sha }}"
+          NEW_NAME="devworkspace-operator.v${CURR_VERSION}.${NEXT_ID}"
+          echo "Updating version for this build to $NEW_VERSION"
+          yq -Yi --arg NEW_VERSION "$NEW_VERSION" \
+            --arg NEW_NAME "$NEW_NAME" \
+            '.spec.version=$NEW_VERSION | .metadata.name=$NEW_NAME' \
+            deploy/templates/components/csv/clusterserviceversion.yaml
+
+          ./build/scripts/build_index_image.sh \
+            --bundle-repo ${DWO_BUNDLE_REPO} \
+            --bundle-tag ${DWO_BUNDLE_TAG} \
+            --index-image ${DWO_INDEX_IMG} \
+            --container-tool docker \
+            --force

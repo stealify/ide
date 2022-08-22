@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/stealify/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:devfile/devworkspace-operator.git
+	branch = main
+	commit = cfcfd09c97ac48761333ad84cb479b6882744c70
+	parent = dd97425be9493a847486605a95c1656d28cf6808
+	method = merge
+	cmdver = 0a31831

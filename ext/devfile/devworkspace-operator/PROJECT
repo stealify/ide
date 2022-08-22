@@ -1,0 +1,33 @@
+domain: devfile.io
+layout:
+- go.kubebuilder.io/v2
+multigroup: true
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: devworkspace-operator
+repo: github.com/devfile/devworkspace-operator
+resources:
+- controller: true
+  domain: devfile.io
+  group: controller
+  kind: DevWorkspaceRouting
+  path: github.com/devfile/devworkspace-operator/apis/controller/v1alpha1
+  version: v1alpha1
+- controller: true
+  domain: devfile.io
+  group: workspace
+  kind: DevWorkspace
+  path: github.com/devfile/devworkspace-operator/apis/workspace/v1alpha1
+  version: v1alpha2
+- domain: devfile.io
+  group: workspace
+  kind: DevWorkspaceTemplate
+  path: github.com/devfile/devworkspace-operator/apis/workspace/v1alpha1
+  version: v1alpha2
+- domain: devfile.io
+  group: controller
+  kind: DevWorkspaceOperatorConfig
+  path: github.com/devfile/devworkspace-operator/apis/controller/v1alpha1
+  version: v1alpha1
+version: "3"

@@ -1,0 +1,43 @@
+name: "Uses endpoint name as port name if it it fits pod spec"
+
+input:
+  components:
+    - name: testing-container-1
+      container:
+        image: testing-image-1
+        memoryRequest: "-1"  # isolate test to not include this field
+        memoryLimit: "-1"  # isolate test to not include this field
+        cpuRequest: "-1"  # isolate test to not include this field
+        cpuLimit: "-1"  # isolate test to not include this field
+        mountSources: false
+        endpoints:
+          - name: "short-name" # Should use endpoint name if <=15 chars long (as supported by pod spec)
+            targetPort: 8080
+            protocol: http
+          - name: "longer-endpoint-name" # Should fallback to "<port>-<protocol>" for names too long for pod spec
+            targetPort: 8081
+            protocol: http
+
+output:
+  podAdditions:
+    containers:
+      - name: testing-container-1
+        image: testing-image-1
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "-1"
+            cpu: "-1"
+          limits:
+            memory: "-1"
+            cpu: "-1"
+        env:
+          - name: "DEVWORKSPACE_COMPONENT_NAME"
+            value: "testing-container-1"
+        ports:
+          - name: "short-name"
+            containerPort: 8080
+            protocol: TCP
+          - name: "8081-http"
+            containerPort: 8081
+            protocol: TCP
