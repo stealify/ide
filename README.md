@@ -1,9 +1,6 @@
-# ide
-StealJS / DoneJS / DIREKTSPEED - IDE 
+# @stealify/ide
+All Kind of IDE Related Tooling and Stuff
 
-
-Fully Integrated Development Environment For DoneJS / StealJS / DIREKTSPEED Framework Applications
-
-## Standalone
-
-## Addons
+## Goals
+Replacing vscodium, codeserver, eclipse-che, theia
+With Stealify Implementations of that functionality.
