@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/stealify/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:VSCodium/vscodium.git
+	branch = master
+	commit = f21c11dde0ac50bc4d53e86a7ea3d108acce2f20
+	parent = 3bf9322112ce3bb90167459fe2fdfdbd693db944
+	method = merge
+	cmdver = 0a31831

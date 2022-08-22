@@ -1,0 +1,66 @@
+diff --git a/src/vs/base/common/product.ts b/src/vs/base/common/product.ts
+index 1ae8079..eb56045 100644
+--- a/src/vs/base/common/product.ts
++++ b/src/vs/base/common/product.ts
+@@ -72,2 +72,3 @@ export interface IProductConfiguration {
+ 		readonly serviceUrl: string;
++		readonly cacheUrl?: string;
+ 		readonly itemUrl: string;
+diff --git a/src/vs/platform/product/common/product.ts b/src/vs/platform/product/common/product.ts
+index 7e63a16..3bfeab8 100644
+--- a/src/vs/platform/product/common/product.ts
++++ b/src/vs/platform/product/common/product.ts
+@@ -6,3 +6,3 @@
+ import { FileAccess } from 'vs/base/common/network';
+-import { globals } from 'vs/base/common/platform';
++import { globals, isWindows } from 'vs/base/common/platform';
+ import { env } from 'vs/base/common/process';
+@@ -11,2 +11,3 @@ import { dirname, joinPath } from 'vs/base/common/resources';
+ import { ISandboxConfiguration } from 'vs/base/parts/sandbox/common/sandboxTypes';
++import { getUserDataPath } from 'vs/platform/environment/node/userDataPath';
+ 
+@@ -36,2 +37,28 @@ else if (typeof require?.__$__nodeRequire === 'function') {
+ 
++	// Merge user-customized product.json
++	try {
++		const merge = (...objects: any[]) =>
++			objects.reduce((result, current) => {
++				Object.keys(current).forEach((key) => {
++					if (Array.isArray(result[key]) && Array.isArray(current[key])) {
++						result[key] = current[key];
++					} else if (typeof result[key] === 'object' && typeof current[key] === 'object') {
++						result[key] = merge(result[key], current[key]);
++					} else {
++						result[key] = current[key];
++					}
++				});
++
++				return result;
++			}, {}) as any;
++
++		const userDataPath = getUserDataPath({} as any);
++		const userProductPath = isWindows ? `file:///${userDataPath}/product.json` : `file://${userDataPath}/product.json`;
++
++		const userProduct = require.__$__nodeRequire(FileAccess.asFileUri(userProductPath, require).fsPath);
++
++		product = merge(product, userProduct);
++	} catch (ex) {
++	}
++
+ 	// Running out of sources
+@@ -46,2 +73,15 @@ else if (typeof require?.__$__nodeRequire === 'function') {
+ 
++	// Set user-defined extension gallery
++	const { serviceUrl, cacheUrl, itemUrl, controlUrl, recommendationsUrl } = product.extensionsGallery || {}
++
++	Object.assign(product, {
++		extensionsGallery: {
++			serviceUrl: env['VSCODE_GALLERY_SERVICE_URL'] || serviceUrl,
++			cacheUrl: env['VSCODE_GALLERY_CACHE_URL'] || cacheUrl,
++			itemUrl: env['VSCODE_GALLERY_ITEM_URL'] || itemUrl,
++			controlUrl: env['VSCODE_GALLERY_CONTROL_URL'] || controlUrl,
++			recommendationsUrl: env['VSCODE_GALLERY_RECOMMENDATIONS_URL'] || recommendationsUrl
++		}
++	})
++
+ 	Object.assign(product, {
