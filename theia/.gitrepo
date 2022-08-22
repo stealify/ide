@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/stealify/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:eclipse-theia/theia.git
+	branch = master
+	commit = f3a81e7dfe2fb3968220ae715f2af67a7b759099
+	parent = 85ce7613b716b1f9ae5163ee2b7ea8eecc5154bd
+	method = merge
+	cmdver = 0a31831
