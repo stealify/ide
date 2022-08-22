@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/stealify/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:eclipse/che.git
+	branch = main
+	commit = f4532fb3618ab7787aff6c3049c04be4359225d2
+	parent = a47ec3e00155d3d830aa0cffb5056c4e0876d24e
+	method = merge
+	cmdver = 0a31831

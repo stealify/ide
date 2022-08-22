@@ -1,0 +1,255 @@
+# Copyright (c) 2020 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# List of repositories of Eclipse Che components
+---
+repositories:
+  - url: https://github.com/eclipse/che
+    name: che
+    description: >-
+      (this repository) the main project repository
+    devfile: https://github.com/eclipse/che/blob/main/devfile.yaml
+    doc: https://github.com/eclipse/che/blob/main/CONTRIBUTING.md#che-server-aka-ws-master
+    useCheReleaseLifecycle: true
+    components:
+      - name: tests
+        url: https://github.com/eclipse/che/tree/main/tests
+        description: >-
+          source code of our integration tests.
+  - url: https://github.com/eclipse-che/che-server/
+    name: che-server
+    description: >-
+      Che server project repository
+    devfile: https://github.com/eclipse-che/che-server/blob/HEAD/devfile.yaml
+    doc: https://github.com/eclipse/che/blob/HEAD/CONTRIBUTING.md#che-server-aka-ws-master
+    useCheReleaseLifecycle: true
+    components:
+     - name: dockerfiles
+       url: https://github.com/eclipse-che/che-server/tree/HEAD/dockerfiles
+       description: >-
+         source code, dockerfiles to build our main docker images. Note that Che-theia related dockerfiles are located in che-theia repo.
+     - name: che-server
+       url: https://github.com/eclipse-che/che-server/tree/HEAD/wsmaster
+       description: >-
+         orchestrates the Che workspaces with devfiles on Kubernetes
+     - name: tests
+       url: https://github.com/eclipse/che/tree/master/tests
+       description: >-
+         source code of our integration tests.
+  - url: https://github.com/eclipse-che/che-theia
+    name: che-theia
+    description: >-
+      Theia IDE integrated in Che.
+    devfile: https://github.com/eclipse-che/che-theia/blob/main/devfiles/che-theia-all.devfile.yaml
+    doc: https://github.com/eclipse-che/che-theia/blob/main/CONTRIBUTING.md
+    useCheReleaseLifecycle: true
+    components:
+     - name: generator
+       url: https://github.com/eclipse-che/che-theia/tree/main/generator
+       description: >-
+         `che:theia init` CLI to prepare and build che-theia
+       doc: https://github.com/eclipse-che/che-theia/blob/main/generator/CONTRIBUTING.md
+  - url: https://github.com/che-incubator/chectl
+    name: chectl
+    description: >-
+      The CLI to install Che, create and start workspaces and devfiles
+    devfile: https://github.com/che-incubator/chectl/blob/master/devfile.yaml
+    doc: https://github.com/che-incubator/chectl/blob/master/CONTRIBUTING.md
+    useCheReleaseLifecycle: true
+  - url: https://github.com/che-incubator/che-code
+    name: che-code
+    description: >-
+      Fork of "Code - OSS" to work with Eclipse Che
+    devfile: https://github.com/che-incubator/che-code/blob/main/devfile.yaml
+    doc: https://github.com/che-incubator/che-code/blob/main/README.md
+    useCheReleaseLifecycle: true
+  - url: https://github.com/eclipse-che/che-dashboard
+    name: dashboard
+    description: >-
+     UI to manage workspaces, devfiles, etc.
+    devfile: https://github.com/eclipse-che/che-dashboard/blob/main/devfile.yaml
+    doc: https://github.com/eclipse-che/che-dashboard/blob/main/README.md#eclipse-che-dashboard
+    useCheReleaseLifecycle: true
+  - url: https://github.com/eclipse-che/che-devfile-registry
+    name: devfile-registry
+    description: >-
+      The default set of devfiles that would be made available on the Che dashboard stacks.
+    useCheReleaseLifecycle: true
+  - url: https://github.com/eclipse-che/che-docs
+    name: docs
+    description: >-
+      Eclipse Che documentation https://github.com/eclipse-che/che-docs source code.
+    devfile: https://github.com/eclipse-che/che-docs/blob/main/devfile.yaml
+    doc: https://github.com/eclipse-che/che-docs/blob/main/CONTRIBUTING.adoc
+    useCheReleaseLifecycle: true
+  - url: https://github.com/eclipse-che/che-machine-exec
+    name: machine-exec
+    description: >-
+      Interface to execute tasks and terminals on other containers within a workspace.
+    devfile: https://github.com/eclipse-che/che-machine-exec/blob/master/devfile.yaml
+    doc: https://github.com/eclipse-che/che-machine-exec/blob/master/CONTRIBUTING.md
+    useCheReleaseLifecycle: true
+  - url: https://github.com/eclipse-che/che-operator
+    name: operator
+    description: >-
+      Che operator to deploy, update and manage K8S/OpenShift resources of Che.
+    devfile: https://github.com/eclipse-che/che-operator/blob/master/devfile.yaml
+    useCheReleaseLifecycle: true
+  - url: https://github.com/eclipse-che/che-plugin-broker
+    name: plugin-broker
+    description: >-
+      The workspace microservice that is in charge of analyzing, preparing and installing the workspace components defined in a Devfile.
+    devfile: https://github.com/eclipse-che/che-plugin-broker/blob/master/devfile.yaml
+    doc: https://github.com/eclipse-che/che-plugin-broker/blob/master/CONTRIBUTING.md
+    useCheReleaseLifecycle: false
+  - url: https://github.com/eclipse-che/che-plugin-registry
+    name: plugin-registry
+    description: >-
+      The default set of Che plugins (vscode extension + containers) or editors that could be installed on any Che workspaces.
+    useCheReleaseLifecycle: true
+  - url: https://github.com/eclipse-che/che-website
+    name: website
+    description: >-
+      https://eclipse.org/che website source code.
+    devfile: https://github.com/eclipse-che/che-website/blob/main/.devfile.yaml
+    useCheReleaseLifecycle: false
+  - url: https://github.com/eclipse-che/che-workspace-client
+    name: workspace-client
+    description: >-
+      JS library to interact with a che-server.
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-container-tools
+    name: che-container-tools
+    description: >-
+      Base image used for sidecars that service container tooling plugins
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-custom-nodejs-deasync
+    name: che-custom-nodejs-deasync
+    description: >-
+      Provides a custom nodejs binary embedding deasync node-gyp module as builtin module
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-cert-manager-ca-cert-generator-image
+    name: che-cert-manager-ca-cert-generator-image
+    description: >-
+      CA cert generation job image used by chectl
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-buildkit-base
+    name: che-buildkit-base
+    description: >-
+      Eclipse Che Sidecar container for buildkit tooling
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-buildah-base
+    name: che-buildah-base
+    description: >-
+      Use this image to build docker images using buildah
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-docker-registry-image-copier
+    name: che-docker-registry-image-copier
+    description: >-
+      copy images between public and private docker registry inside k8s cluster
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-php-base
+    name: che-php-base
+    description: >-
+      Base image to be used for the PHP devfile
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-dockerfiles/che-tls-secret-creator
+    name: che-tls-secret-creator
+    description: >-
+      This images generates TLS certificates
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/che-theia-openshift-auth
+    name: che-theia-openshift-auth
+    description: >-
+      OpenShift authentication plugin
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/configbump
+    name: configbump
+    description: >-
+      Simple Kubernetes controller that is able to quickly synchronize a set of config maps
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/workspace-data-sync
+    name: workspace-data-sync
+    description: >-
+      Provides the ability to increase I/O performance for a developer workspaces
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/che-workspace-telemetry-client
+    name: che-workspace-telemetry-client
+    description: >-
+      abstract telemetry API and a Typescript implementation of the API.
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/kubernetes-image-puller
+    name: kubernetes-image-puller
+    description: >-
+      ensures that all nodes in the cluster have those images cached
+    useCheReleaseLifecycle: false
+  - url: https://github.com/eclipse-che/blog
+    name: blog
+    description: >-
+      Eclispe Che blog content. Get published at https://che.eclipseprojects.io/
+    useCheReleaseLifecycle: false
+    devfile: https://github.com/eclipse-che/blog/blob/main/devfile.yaml
+  - url: https://github.com/eclipse-che/che-docs-vale-style
+    name: che-docs-vale-style
+    description: >-
+      Vale style for Eclipse Che Documentation and related projects
+    useCheReleaseLifecycle: false
+  - url: https://github.com/eclipse-che/che-release
+    name: che-release
+    description: >-
+      orchestration scripts for Eclipse Che artifacts and container images.
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/che-deploy-action
+    name: che-deploy-action
+    description: >-
+      GitHub action deploying Eclipse Che using chectl
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/devfile-converter
+    name: devfile-converter
+    description: >-
+      Allow to convert Devfile v1 to v2 or v2 to v1
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/happy-path-tests-action
+    name: happy-path-tests-action
+    description: >-
+      Run Happy Path tests as part of a Github action
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/header-rewrite-traefik-plugin
+    name: header-rewrite-traefik-plugin
+    description: >-
+      Traefik plugin that can modify http headers. 
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/jetbrains-editor-images
+    name: jetbrains-editor-images
+    description: >-
+      Run JetBrains IDE remotely in Eclipse Che
+    useCheReleaseLifecycle: false
+  - url: https://github.com/che-incubator/kubernetes-image-puller-operator
+    name: kubernetes-image-puller-operator
+    description: >-
+      Install, configure, and manage the kubernetes-image-puller
+    useCheReleaseLifecycle: false
+  - url: https://github.com/devfile/devworkspace-operator
+    name: devworkspace-operator
+    description: >-
+      Runs devfile based development environments on Kubernetes
+    useCheReleaseLifecycle: false
+  - url: https://github.com/devfile/registry
+    name: registry
+    description: >-
+      Upstream devfile registry
+    useCheReleaseLifecycle: false
+  - url: https://github.com/devfile/developer-images
+    name: developer-images
+    description: >-
+      Container images to code, build run applications on secured Kubernetes clusters
+    useCheReleaseLifecycle: false
+  - url: https://github.com/devfile/devworkspace-operator-docs
+    name: devworkspace-operator-docs
+    description: >-
+      DevWorkspace operator documentation
+    useCheReleaseLifecycle: false
