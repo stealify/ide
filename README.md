@@ -7,7 +7,8 @@ With Stealify Implementations of that functionality.
 
 
 ## Moved
-Calling it now editor moving the main effort into a own org called https://github.com/unlicense-code/
+Calling it now editor moving the main effort into a own org called https://github.com/unlicense-code/editor 
+https://github.io/unlicense-code/editor/installer to create your own builds.
 
 ## Experiment Conclusion
 Maintainance of existing build structures creates Work N Potenzial N is to High. 
